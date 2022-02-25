@@ -4,6 +4,10 @@ import numpy as np
 
 class SquareLattice:
     def __init__(self, size=20):
+        """
+        Class for modelling a square lattice described with frustrated Ising model
+        :param size: if 20, then square lattice 20x20 spins will be created
+        """
         self.size = size
         self.hamiltonian = None
         self.extra_energy = 0
@@ -12,6 +16,12 @@ class SquareLattice:
         self.field = 0
 
     def nearest_neighbours(self, i, j):
+        """
+        Generates a list of ferromagnetic neighbours for spin [i,j]
+        :param i: coordinate of a spin in a lattice along 1st axis
+        :param j: coordinate of a spin in a lattice along 2d axis
+        :return: coordinates of nearest neighbours in a lattice
+        """
         if i != 0 and j != 0 and i != self.size - 1 and j != self.size - 1:
             return [[i, j - 1], [i - 1, j], [i, j + 1], [i + 1, j]]
         elif i == 0 and j != 0 and j != self.size - 1:
@@ -32,6 +42,12 @@ class SquareLattice:
             return [[i - 1, j], [i, j - 1]]
 
     def diagonal_neighbours(self, i, j):
+        """
+        Generates a list of antiferromagnetic neighbours for spin [i,j]
+        :param i: coordinate of a spin in a lattice along 1st axis
+        :param j: coordinate of a spin in a lattice along 2d axis
+        :return: coordinaate of diagonal neighbours in a lattice
+        """
         if i != 0 and j != 0 and i != self.size - 1 and j != self.size - 1:
             return [[i - 1, j - 1], [i - 1, j + 1], [i + 1, j + 1], [i + 1, j - 1]]
         elif i == 0 and j != 0 and j != self.size - 1:
@@ -58,9 +74,11 @@ class SquareLattice:
 
     def create_zero_field_hamiltonian(self, j2_j1_rate, j1=1):
         """
-        :param j1:
-        :param j2_j1_rate: J2/J1 rate
-        :return:
+        Creates classical hamiltonian with zero magnetic field along z-axis. Better not to use directly,
+        using create_full_hamiltonian with field=0 is advised
+        :param j1: ferromagnetic j-coupling constant (J1)
+        :param j2_j1_rate: J2/J1 rate, where J2 is antiferromagnetic constant
+        :return: zero-field hamiltonian for QUBO
         """
         j2 = j1 * j2_j1_rate
         hamiltonian = np.zeros((self.size ** 2, self.size ** 2))
@@ -80,12 +98,23 @@ class SquareLattice:
         self.j2 = j2
         return self.hamiltonian
 
-    def add_field(self, field):  # this function should be the last one
+    def add_field(self, field):
+        """
+        Adds field to zero-field hamiltonian (use after create_zero_field_hamiltonian)
+        :param field: magnetic field induction
+        """
         self.field = field
         self.extra_energy += field * self.size ** 2
         self.hamiltonian -= 2 * field * np.identity(self.size ** 2)
 
     def create_full_hamiltonian(self, j2_j1_rate, field, j1=1):
+        """
+        Creates full hamiltonian
+        :param j2_j1_rate: J2/J1 rate, where J2 is antiferromagnetic constant
+        :param field: magnetic field induction
+        :param j1: ferromagnetic j-coupling constant (J1)
+        :return: full hamiltonian for QUBO
+        """
         self.create_zero_field_hamiltonian(j2_j1_rate, j1)
         self.add_field(field)
         return self.hamiltonian

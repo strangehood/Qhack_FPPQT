@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Optional
 
 import numpy as np
@@ -10,11 +11,20 @@ class DwaveSolver:
     }
 
     def __init__(self, token: str):
+        """
+        Class for solving QUBO problem with D-Wave
+        :param token: string which is used for authentication (please, use your personal token)
+        """
         self.token = token
         self.sampler = EmbeddingComposite(DWaveSampler(token=self.token))
 
     def sample(self, qubo: np.ndarray, dwave_parameters: Optional[dict] = None):
-
+        """
+        Solves QUBO problem
+        :param qubo: QUBO matrix of a problem
+        :param dwave_parameters: dictionary of parameters
+        :return: binary solution of a QUBO and energy
+        """
         dwave_parameters = dwave_parameters or {}
         for key, value in self.DEFAULT_DWAVE_PARAMS.items():
             if key not in dwave_parameters:

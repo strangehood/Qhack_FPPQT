@@ -8,10 +8,23 @@ from typing import Optional, List
 
 class CPLEXSolver:
     def __init__(self, show_timer=False):
+        """
+        Class for solving QUBO-problem with CPLEX
+        :param show_timer: True if show, False if not :)
+        """
         self.show_timer = show_timer
 
     def sample(self, qubo: np.ndarray, show_timer=None, TimeLimit=None, starting_point: Optional[List] = None,
                log_output=False):
+        """
+        Solves QUBO problem
+        :param qubo: QUBO matrix
+        :param show_timer: True if show, False if not :)
+        :param TimeLimit: limitation on a duration of solving problem
+        :param starting_point: initial guess
+        :param log_output: if True, function will print many logs in std
+        :return: solution of QUBO, energy
+        """
         show_timer = show_timer or self.show_timer
         model = Model()
         x_vars = [model.binary_var(f"x_{i}") for i in range(qubo.shape[0])]
